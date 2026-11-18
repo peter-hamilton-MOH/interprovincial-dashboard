@@ -1,0 +1,5 @@
+node_modules/
+dist/
+server/intelligence_hub.sqlite
+server/intelligence_hub.sqlite-shm
+server/intelligence_hub.sqlite-wal
