@@ -579,7 +579,7 @@ export default function App() {
         </header>
 
         {/* Page Viewport */}
-        <main className="flex-1 w-full max-w-5xl mx-auto px-4 sm:px-5 py-4 sm:py-5 overflow-x-hidden">
+        <main className={`flex-1 w-full max-w-5xl mx-auto px-4 sm:px-5 py-4 sm:py-5 ${activeTab === 'brief' ? 'overflow-x-visible' : 'overflow-x-hidden'}`}>
           {activeTab === 'news' && (
             <NewsFeedView
               groupedData={groupedData}

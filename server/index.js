@@ -14,6 +14,59 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
+// Optional password gate. Only active when SITE_PASSWORD is set (set in Render, not locally).
+const SITE_PASSWORD = process.env.SITE_PASSWORD || '';
+const AUTH_COOKIE = 'hub_auth';
+const AUTH_TOKEN = SITE_PASSWORD
+  ? crypto.createHmac('sha256', SITE_PASSWORD).update('intelligence-hub-auth').digest('hex')
+  : '';
+
+function readCookie(req, name) {
+  for (const part of (req.headers.cookie || '').split(';')) {
+    const [key, ...value] = part.trim().split('=');
+    if (key === name) return decodeURIComponent(value.join('='));
+  }
+  return null;
+}
+
+function safeEqual(a, b) {
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  return bufA.length === bufB.length && crypto.timingSafeEqual(bufA, bufB);
+}
+
+function isAuthenticated(req) {
+  if (!SITE_PASSWORD) return true;
+  const token = readCookie(req, AUTH_COOKIE);
+  return Boolean(token) && safeEqual(token, AUTH_TOKEN);
+}
+
+app.get('/api/auth/status', (req, res) => {
+  res.json({ required: Boolean(SITE_PASSWORD), authenticated: isAuthenticated(req) });
+});
+
+app.post('/api/auth/login', (req, res) => {
+  if (!SITE_PASSWORD) return res.json({ ok: true });
+  const submitted = typeof req.body?.password === 'string' ? req.body.password : '';
+  if (!safeEqual(submitted, SITE_PASSWORD)) {
+    return res.status(401).json({ error: 'Incorrect password' });
+  }
+  const secure = req.secure || req.headers['x-forwarded-proto'] === 'https';
+  res.setHeader(
+    'Set-Cookie',
+    `${AUTH_COOKIE}=${AUTH_TOKEN}; Path=/; HttpOnly; SameSite=Lax; Max-Age=2592000${secure ? '; Secure' : ''}`
+  );
+  res.json({ ok: true });
+});
+
+app.use((req, res, next) => {
+  if (isAuthenticated(req)) return next();
+  if (req.path.startsWith('/api/') && !req.path.startsWith('/api/auth/')) {
+    return res.status(401).json({ error: 'Password required' });
+  }
+  next();
+});
+
 const db = initDatabase(false);
 
 // Helper to build WHERE clause for intelligence_items

@@ -32,15 +32,6 @@ function formatPostedDate(isoString) {
   });
 }
 
-function formatIsoDay(isoDate) {
-  return new Date(`${isoDate}T00:00:00Z`).toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-    timeZone: 'UTC',
-  });
-}
-
 export default function BriefView({ meta }) {
   const [selectedWeek, setSelectedWeek] = useState(weekFromPath);
   const [weekMenuOpen, setWeekMenuOpen] = useState(false);
@@ -217,9 +208,21 @@ export default function BriefView({ meta }) {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 pb-8 pt-2">
-      <section>
-        <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand-600">Weekly Brief</p>
+    <div className="max-w-5xl mx-auto space-y-8 pb-8">
+      <div className="relative space-y-3 -mt-3 -mb-3">
+        <img
+          src="/assets/fall_banner.png"
+          alt=""
+          aria-hidden="true"
+          className="absolute left-1/2 -top-5 z-0 h-[370px] w-[min(1212px,calc(100vw-2rem))] max-w-none object-cover -translate-x-1/2 [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent),linear-gradient(to_bottom,black_65%,transparent)] [mask-composite:intersect] [-webkit-mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent),linear-gradient(to_bottom,black_65%,transparent)] [-webkit-mask-composite:source-in]"
+        />
+      <section className="relative isolate z-20 w-fit rounded-xl px-4 py-3">
+        <div
+          aria-hidden="true"
+          className="absolute -inset-4 -z-10 backdrop-blur-sm [mask-image:linear-gradient(to_right,transparent,black_30%,black_70%,transparent),linear-gradient(to_bottom,transparent,black_30%,black_70%,transparent)] [mask-composite:intersect] [-webkit-mask-image:linear-gradient(to_right,transparent,black_30%,black_70%,transparent),linear-gradient(to_bottom,transparent,black_30%,black_70%,transparent)] [-webkit-mask-composite:source-in]"
+        />
+
+        <p className="text-xs font-bold uppercase tracking-[0.14em] text-black">Weekly Brief</p>
         <div className="relative mt-1 inline-block">
           <button
             type="button"
@@ -265,12 +268,9 @@ export default function BriefView({ meta }) {
             </>
           )}
         </div>
-        <p className="mt-2 text-sm text-slate-500">
-          Collected through <span className="font-semibold text-slate-700">{formatIsoDay(week.collectedThrough)}</span>
-        </p>
       </section>
 
-      <section className={`${cardClass} px-6 pt-5 pb-6`}>
+      <section className="rounded-2xl border border-slate-200 bg-white/80 backdrop-blur-sm shadow-sm px-6 pt-5 pb-6">
         <div className="mb-5 flex items-center justify-between gap-3">
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">Articles Collected</h3>
           <span className="text-xs text-slate-500">
@@ -281,7 +281,7 @@ export default function BriefView({ meta }) {
           {days.map((day) => (
             <span
               key={day.date}
-              className={`w-20 whitespace-nowrap text-center text-xs ${day.isFuture ? 'text-slate-300 font-normal' : day.isToday ? 'text-brand-700 font-[900]' : 'text-slate-600 font-normal'}`}
+              className={`w-20 whitespace-nowrap text-center text-xs ${day.isFuture ? 'text-slate-700 font-normal' : day.isToday ? 'text-brand-700 font-[900]' : 'text-slate-600 font-normal'}`}
             >
               {day.dayName}
             </span>
@@ -298,7 +298,7 @@ export default function BriefView({ meta }) {
           {days.map((day) => (
             <div key={day.date} className="relative z-10 w-20 flex justify-center">
               {day.isFuture ? (
-                <span className="w-2.5 h-2.5 rounded-full bg-slate-200" />
+                <span className="w-2.5 h-2.5 rounded-full bg-slate-400" />
               ) : (
                 <span
                   className={`rounded-full flex items-center justify-center text-xs tabular-nums ${
@@ -314,8 +314,9 @@ export default function BriefView({ meta }) {
           ))}
         </div>
       </section>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-x-5">
         <section className={`${cardClass} flex flex-col h-[375px] p-5`}>
           <div className="flex items-center justify-between gap-3 pb-3 border-b border-slate-200">
             <div className="flex items-center gap-2.5">

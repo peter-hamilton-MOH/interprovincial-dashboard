@@ -5,7 +5,9 @@ services:
     plan: free
     buildCommand: npm ci && npm run build
     startCommand: npm start
-    healthCheckPath: /api/meta
+    healthCheckPath: /api/auth/status
     envVars:
       - key: NODE_VERSION
         value: "24"
+      - key: SITE_PASSWORD
+        sync: false
